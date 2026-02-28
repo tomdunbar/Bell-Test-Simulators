@@ -35,7 +35,7 @@ def QMtheoryPair(x,y):
     
     return X,Y
 
-def QMtheoryGHZ(x,y,z):
+def QMtheoryGHZ(x,y,z):  #my understanding of how the GHZ state is
 # ------------------------------------
 # Quantum GHZ state
 # ------------------------------------
@@ -59,6 +59,34 @@ def QMtheoryGHZ(x,y,z):
     Z = np.where(rn < p_equal, X, -X)
     
     return X,Y,Z
+
+
+def ghz3_sample(x, y, z):   #alternate understanding
+    """
+    Sample (X, Y, Z) in {+1, -1} for equatorial measurements
+    on a 3-qubit GHZ state with measurement angles x, y, z.
+    
+    Parameters:
+        x, y, z : float
+            Measurement angles (radians)
+    
+    Returns:
+        (X, Y, Z) : tuple of ints (+1 or -1)
+    """
+    # Step 1: sample X and Y uniformly
+    X = np.random.choice([-1, 1], size=N)
+    Y = np.random.choice([-1, 1], size=N)
+    
+    # Step 2: sample product P = XYZ
+    p_equal = (1 + np.cos(x + y + z)) / 2
+    rn = np.random.uniform(0, 1, N)  #random number
+    
+    P = np.where(rn < p_equal, 1, -1)
+    
+    # Step 3: determine Z
+    Z = P * X * Y
+    
+    return X, Y, Z
 
 
 def EXYdelta(X, Y, delta, bins):
@@ -116,7 +144,9 @@ delta_bc = (b - c) % (2*np.pi)
 # -----------------------------------
 # GHZ sampling (vectorized)
 # -----------------------------------
-A,B,C = QMtheoryGHZ(a, b, c)
+#A,B,C = QMtheoryGHZ(a, b, c)
+A,B,C =  ghz3_sample(a, b, c)
+
 
 # Compute pairwise correlations
 E_AB = EXYdelta(A, B, delta_ab, bins)
