@@ -128,6 +128,46 @@ def EXYdelta(X, Y, delta, bins):
 
     return E
 
+
+def EXYZdelta(X, Y, Z,delta, bins):
+    """
+    Compute correlation E(XY) binned by delta (fully vectorized).
+
+    Parameters
+    ----------
+    X, Y Z: arrays of ±1 outcomes
+    delta : asum of angles (same length)
+    bins : array of bin edges
+
+    Returns
+    -------
+    E : array of correlations per bin
+    """
+
+    # Bin index for each delta (0 to num_bins-1)
+    bin_indices = np.digitize(delta, bins) - 1
+
+    num_bins = len(bins) - 1
+
+    # Remove out-of-range values (just in case)
+    valid = (bin_indices >= 0) & (bin_indices < num_bins)
+
+    bin_indices = bin_indices[valid]
+    XYZ = (X * Y * Z)[valid]
+
+    # Count how many samples per bin
+    counts = np.bincount(bin_indices, minlength=num_bins)
+
+    # Sum of XY per bin
+    sums = np.bincount(bin_indices, weights=XYZ, minlength=num_bins)
+
+    # Compute mean safely
+    E = np.full(num_bins, np.nan)
+    nonzero = counts > 0
+    E[nonzero] = sums[nonzero] / counts[nonzero]
+
+    return E
+
 # ------------------------------------
 # Random measurement angles
 # ------------------------------------
@@ -153,6 +193,7 @@ E_AB = EXYdelta(A, B, delta_ab, bins)
 E_AC = EXYdelta(A, C, delta_ac, bins)
 E_BC = EXYdelta(B, C, delta_bc, bins)
 
+E_ABC = EXYZdelta(A, B, C, a+b+c, bins)
 
 # -----------------------------------
 # Three pairs
@@ -210,6 +251,12 @@ plt.scatter(bin_centers, E_BC,
             s=25,
             alpha=0.8,
             label="E(B,C)")
+
+plt.scatter(bin_centers, E_ABC,
+            color="magenta",
+            s=25,
+            alpha=0.8,
+            label="E(A,B,C)")
 
 plt.xlabel(r"$\Delta$, difference in angle")
 plt.ylabel(r"$E$")
