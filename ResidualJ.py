@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # ------------------------------------
 # Parameters
 # ------------------------------------
-N = 10_000       # number of trials
+N = 500_000       # number of trials
 
 num_bins = 100       # bins for delta histogram
 bins = np.linspace(0, 2*np.pi, num_bins + 1)
@@ -76,9 +76,9 @@ def EXYdelta(X, Y, delta, bins):
 
 def Detector_J(x,LHV_angle,J_res):
     
-    X = np.sign(np.cos(LHV_angle - x))
+    X = np.sign(np.cos(x - np.angle(np.exp(1j*LHV_angle) + J_res)))
     
-    J_res = np.exp(1j*LHV_angle) - np.exp(1j *X*x)
+    J_res = np.exp(1j*LHV_angle) - np.exp(1j *X*x)  #initial J - final J
     
     
     return X,J_res
@@ -102,14 +102,17 @@ lam = np.random.uniform(0, 2*np.pi, N)
 Ja_res = 0
 Jb_res = 0
 
+A = np.zeros(N)
+B = np.zeros(N)
+
 for iteration in range(0,N):
     a_angle = a[iteration]
     b_angle = b[iteration]
     lam_angle = lam[iteration] 
 
     # Local deterministic responses
-    A,Ja_res = Detector_J(a_angle,lam_angle,Ja_res)
-    B,Jb_res = Detector_J(b_angle,lam_angle+np.pi,Jb_res)
+    A[iteration],Ja_res = Detector_J(a_angle,lam_angle,Ja_res)
+    B[iteration],Jb_res = Detector_J(b_angle,lam_angle+np.pi,Jb_res)
     
     
 
@@ -147,7 +150,7 @@ plt.scatter(bin_centers, E_lhv,
             color="firebrick",
             s=25,
             alpha=0.8,
-            label="Typical LHV Monte Carlo")
+            label="Residual J LHV Monte Carlo")
 
 
 # plt.scatter(bin_centers, E_sc,
