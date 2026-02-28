@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # ------------------------------------
 # Parameters
 # ------------------------------------
-N = 500_000       # number of trials
+N = 50_000       # number of trials
 
 num_bins = 100       # bins for delta histogram
 bins = np.linspace(0, 2*np.pi, num_bins + 1)
@@ -76,7 +76,7 @@ def EXYdelta(X, Y, delta, bins):
 
 def Detector_J(x,LHV_angle,J_res):
     
-    X = np.sign(np.cos(x - np.angle(np.exp(1j*LHV_angle) + J_res)))
+    X = np.sign(np.cos(x- np.angle(np.exp(1j*LHV_angle))))
     
     J_res = np.exp(1j*LHV_angle) - np.exp(1j *X*x)  #initial J - final J
     
