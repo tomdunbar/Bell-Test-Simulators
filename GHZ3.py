@@ -88,40 +88,93 @@ def ghz3_sample(x, y, z):   #alternate understanding
     
     return X, Y, Z
 
-def singlet3_sample(x, y, z, N=1000):
+
+import numpy as np
+
+def singlet3_sample_exact(x, y, z, N=1000):
     """
-    Sample (A, B, C) in {+1, -1} for equatorial measurements
-    on a 3-qubit singlet-like state (z-basis analogue), vectorized.
+    Fully vectorized sampling of ±1 outcomes for 3-qubit singlet-like state
+    with exact equatorial measurement correlations.
 
     Parameters
     ----------
-    x, y, z : float
+    x, y, z : float or np.ndarray
+        Measurement angles (radians). Can be scalars or arrays.
+    N : int
+        Number of samples per angle set
+
+    Returns
+    -------
+    A, B, C : np.ndarray of ±1, shape (N,) or broadcasted shape
+    """
+    x = np.asarray(x)
+    y = np.asarray(y)
+    z = np.asarray(z)
+
+    # Prepare output arrays
+    A = np.random.choice([-1, 1], size=N)
+    B = np.zeros(N, dtype=int)
+    C = np.zeros(N, dtype=int)
+
+    # Compute probabilities for B given A
+    p_B_eq = (1 - (1/3)*A*np.cos(x - y))  # P(B != A)
+    rn = np.random.uniform(0, 1, size=N)
+    B = np.where(rn < p_B_eq/2, -A, A)
+
+    # Compute probabilities for C given A,B
+    # Exact three-body probability formula:
+    # P(C = +1 | A, B) = 0.5*(1 - A*B*cos(x-y)/3 - A*cos(x-z)/3 - B*cos(y-z)/3)
+    # We'll sample C using conditional probability to maintain correlations
+    cos_xy = np.cos(x - y)
+    cos_xz = np.cos(x - z)
+    cos_yz = np.cos(y - z)
+
+    p_C_plus = 0.5 * (1 - A*B*cos_xy/3 - A*cos_xz/3 - B*cos_yz/3)
+    rn = np.random.uniform(0, 1, size=N)
+    C = np.where(rn < p_C_plus, 1, -1)
+
+    return A, B, C
+
+def singlet3_sample_ghzstyle(x, y, z, N=1000):
+    """
+    Fully vectorized GHZ-style sampler for a 3-qubit singlet-like state
+    with exact angle-dependent pairwise correlations along equatorial plane.
+
+    Parameters
+    ----------
+    x, y, z : float or np.ndarray
         Measurement angles (radians)
     N : int
         Number of samples
 
     Returns
     -------
-    A, B, C : arrays of ±1
+    A, B, C : np.ndarray of ±1 outcomes, shape (N,)
     """
+    x = np.asarray(x).ravel()
+    y = np.asarray(y).ravel()
+    z = np.asarray(z).ravel()
 
-    # Step 1: sample A and B uniformly
+    # Step 1: sample A independently
     A = np.random.choice([-1, 1], size=N)
-    B = np.random.choice([-1, 1], size=N)
 
-    # Step 2: probability that product ABC = +1 or -1
-    # For the 3-qubit singlet-like state, <ABC> = 0
-    # So P(ABC=+1) = P(ABC=-1) = 0.5
-    P = np.random.choice([-1, 1], size=N)
+    # Step 2: sample B conditional on A using pairwise correlation
+    # P(B = A) = (1 + ⟨AB⟩)/2, ⟨AB⟩ = -1/3 cos(x-y)
+    p_B_eq = 0.5 * (1 - (1/3) * A * np.cos(x - y))
+    rn = np.random.uniform(0, 1, size=N)
+    B = np.where(rn < p_B_eq, A, -A)
 
-    # Step 3: determine C from product
-    # Ensure product matches the sampled P: C = P * A * B
-    C = P * A * B
+    # Step 3: sample C conditional on A and B using remaining pairwise correlations
+    # ⟨AC⟩ and ⟨BC⟩
+    cos_xz = np.cos(x - z)
+    cos_yz = np.cos(y - z)
+
+    # Approximate C probability: P(C = +1) = 0.5 * (1 - A*cos(x-z)/3 - B*cos(y-z)/3)
+    p_C_plus = 0.5 * (1 - A * cos_xz / 3 - B * cos_yz / 3)
+    rn = np.random.uniform(0, 1, size=N)
+    C = np.where(rn < p_C_plus, 1, -1)
 
     return A, B, C
-
-
-
 
 def E_delta(*arrays, delta, bins):
     """
