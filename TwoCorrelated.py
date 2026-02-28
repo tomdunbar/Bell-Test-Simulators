@@ -20,45 +20,21 @@ bin_centers = 0.5 * (bins[:-1] + bins[1:])
 
 def QMtheoryPair(x,y):
 # ------------------------------------
-# Quantum singlet outcomes Monte Carlo
+# Quantum singlet, but correlated,  Monte Carlo
 # ------------------------------------
     #collaspe the wavefcn by measuring on x    
     X = np.random.choice([-1, 1], size=N)
     
     #Probability that X == Y, given x and y
-    p_equal = (1 - np.cos(x-y)) / 2
+    p_equal = (1 + np.cos(x+y)) / 2
     
     rn = np.random.uniform(0, 1, N)  #random number
-    # If rn < p_equal → Y = X
-    # else → Y = -X
-    Y = np.where(rn < p_equal, X, -X)
+    P = np.where(rn < p_equal, 1, -1)
+    
+    # Step 3: determine Z
+    Y = P * X
     
     return X,Y
-
-def QMtheoryGHZ(x,y,z):  #my understanding of how the GHZ state is
-# ------------------------------------
-# Quantum GHZ state
-# ------------------------------------
-    #collaspe the wavefcn by measuring on x    
-    X = np.random.choice([-1, 1], size=N)
-    
-    #Probability that X == Y, given x and y
-    p_equal = (1 - np.cos(x-y)) / 2
-    
-    rn = np.random.uniform(0, 1, N)  #random number
-    # If rn < p_equal → Y = X
-    # else → Y = -X
-    Y = np.where(rn < p_equal, X, -X)
-    
-    #Probability that X == Z, given x and Z
-    p_equal = (1 - np.cos(x-z)) / 2
-    
-    rn = np.random.uniform(0, 1, N)  #random number
-    # If rn < p_equal → Z = X
-    # else → Z = -X
-    Z = np.where(rn < p_equal, X, -X)
-    
-    return X,Y,Z
 
 
 def ghz3_sample(x, y, z):   #alternate understanding
@@ -87,40 +63,6 @@ def ghz3_sample(x, y, z):   #alternate understanding
     Z = P * X * Y
     
     return X, Y, Z
-
-def singlet3_sample(x, y, z, N=1000):
-    """
-    Sample (A, B, C) in {+1, -1} for equatorial measurements
-    on a 3-qubit singlet-like state (z-basis analogue), vectorized.
-
-    Parameters
-    ----------
-    x, y, z : float
-        Measurement angles (radians)
-    N : int
-        Number of samples
-
-    Returns
-    -------
-    A, B, C : arrays of ±1
-    """
-
-    # Step 1: sample A and B uniformly
-    A = np.random.choice([-1, 1], size=N)
-    B = np.random.choice([-1, 1], size=N)
-
-    # Step 2: probability that product ABC = +1 or -1
-    # For the 3-qubit singlet-like state, <ABC> = 0
-    # So P(ABC=+1) = P(ABC=-1) = 0.5
-    P = np.random.choice([-1, 1], size=N)
-
-    # Step 3: determine C from product
-    # Ensure product matches the sampled P: C = P * A * B
-    C = P * A * B
-
-    return A, B, C
-
-
 
 
 def E_delta(*arrays, delta, bins):
@@ -177,9 +119,9 @@ b = np.random.uniform(0, 2*np.pi, N)
 c = np.random.uniform(0, 2*np.pi, N)
 
 # Compute deltas
-delta_ab = (a - b) % (2*np.pi)
-delta_ac = (a - c) % (2*np.pi)
-delta_bc = (b - c) % (2*np.pi)
+delta_ab = (a + b) % (2*np.pi)
+delta_ac = (a + c) % (2*np.pi)
+delta_bc = (b + c) % (2*np.pi)
 
 
 # -----------------------------------
@@ -218,7 +160,7 @@ E_B1C2 = E_delta(B1, C2, delta = delta_bc, bins = bins)
 # Ideal and Monte Carlo results
 # ------------------------------------
 delta_fine = np.linspace(0, 2*np.pi, 500)
-E_qm_ideal  = -np.cos(delta_fine)
+E_qm_ideal  = np.cos(delta_fine)
 #E_BC_ideal = np.cos(delta_fine) * np.cos(delta_fine)
 E_BC_ideal = 1/2*np.cos(delta_fine)
 
@@ -228,13 +170,13 @@ plt.figure(figsize=(8,5))
 plt.plot(delta_fine, E_qm_ideal,
          color="tab:blue",
          linewidth=1.5,
-         label="$-\\cos(\Delta)$")
+         label="$\\cos(\Delta)$")
 
-plt.plot(delta_fine, E_BC_ideal,
-         color="tab:green",
-         linewidth=1.5,
-         #label="Ideal QM  $\\cos(a-b)\\cos(a-c)$"
-         label="$0.5\\cos(\Delta)$")
+# plt.plot(delta_fine, E_BC_ideal,
+#          color="tab:green",
+#          linewidth=1.5,
+#          #label="Ideal QM  $\\cos(a-b)\\cos(a-c)$"
+#          label="$0.5\\cos(\Delta)$")
 
 # Monte Carlo points
 plt.scatter(bin_centers, E_AB,
@@ -261,7 +203,7 @@ plt.scatter(bin_centers, E_ABC,
             alpha=0.8,
             label="E(A,B,C)")
 
-plt.xlabel(r"$\Delta$, difference in angle")
+plt.xlabel(r"$\Delta$, sum of angles")
 plt.ylabel(r"$E$")
 plt.title("One GHZ Tripple")
 
@@ -278,7 +220,7 @@ plt.figure(figsize=(8,5))
 plt.plot(delta_fine, E_qm_ideal,
          color="tab:blue",
          linewidth=1.5,
-         label="$-\\cos(\Delta)$")
+         label="$\\cos(\Delta)$")
 
 # Monte Carlo points
 plt.scatter(bin_centers, E_A1B1,
@@ -305,7 +247,7 @@ plt.scatter(bin_centers, E_B1C2,
             alpha=0.8,
             label="E(B1,C2)")
 
-plt.xlabel(r"$\Delta$, difference in angle")
+plt.xlabel(r"$\Delta$, sum in angle")
 plt.ylabel(r"$E$")
 plt.title("Three Entangled Pairs")
 
