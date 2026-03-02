@@ -103,6 +103,9 @@ B_lmc = -np.sign(np.cos(b - halfsin_samples + np.pi/2))
 
 E_lmc = EXYdelta(A_lmc,B_lmc,delta_ab, bins)
 #this is off by a factor of pi/2, but its the closes cosine curve we can get
+#The correlation becomes the overlap of two shifted square waves → linear in θ.
+
+#Fourier expanding that linear function gives first harmonic amplitude: 2/pi
 
 # ------------------------------------
 # 1/2 cosine LHV Monte Carlo
@@ -133,6 +136,9 @@ delta_fine = np.linspace(0, 2*np.pi, 500)
 E_qm_ideal  = -np.cos(delta_fine)
 E_lhv_ideal = -2/np.pi * np.arcsin(np.cos(delta_fine))  # triangle
 E_lmc_ideal = -2/np.pi * np.cos(delta_fine)  #local max correlation
+
+#1/np.sqrt(2) * np.cos(delta_fine)  
+#correlation is only possible for finite angle sets, such as CHSH
 
 plt.figure(figsize=(8,5))
 
