@@ -102,9 +102,8 @@ A_lmc = np.sign(np.cos(a))
 B_lmc = -np.sign(np.cos(b - halfsin_samples + np.pi/2))
 
 E_lmc = EXYdelta(A_lmc,B_lmc,delta_ab, bins)
-#this is off by a factor of pi/2, but its the closes cosine curve we can get
+#this is off by a factor of pi/2, but its the closest cosine curve we can get
 #The correlation becomes the overlap of two shifted square waves → linear in θ.
-
 #Fourier expanding that linear function gives first harmonic amplitude: 2/pi
 
 # ------------------------------------
