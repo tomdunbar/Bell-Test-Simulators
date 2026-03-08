@@ -39,15 +39,52 @@ def finv(x):
 
     return xprime
 
+#Test Numbers based on paper
+# x = [0,1/2,1,np.pi,2*np.pi]
+# xprime = finv(x)
+# print("x = ",x," and x' = ",xprime,"\n")
+# xcalc = f(xprime)
+# print("x' = ",xprime," and x = ",xcalc,"\n")
 
-x = [0,1/2,1,np.pi,2*np.pi]
+## Lots of Plots
 
-xprime = finv(x)
+x = np.linspace(-1, 1, 500)
 
-print("x = ",x," and x' = ",xprime,"\n")
+fig, ax = plt.subplots()
 
-xcalc = f(xprime)
+plt.plot(x, finv(x),
+         color="tab:blue",
+         linewidth=1,
+         linestyle='--',
+         label="x vs x'")
 
-print("x' = ",xprime," and x = ",xcalc,"\n")
+plt.plot(x,x,
+         color="tab:red",
+         linewidth=1,
+         label="x vs x")
 
-#delta_fine = np.linspace(0, 2*np.pi, 500)
+plt.xlabel(r"x")
+plt.ylabel(r"x'")
+
+
+# ---- Center the axes ----
+ax.spines['left'].set_position('zero')
+ax.spines['bottom'].set_position('zero')
+
+# Hide top/right spines
+ax.spines['right'].set_color('none')
+ax.spines['top'].set_color('none')
+
+# ---- Remove grid ----
+ax.grid(False)
+
+# ---- Tick marks every 0.5 ----
+ax.xaxis.set_major_locator(0.5)
+ax.yaxis.set_major_locator(0.5)
+
+# Make ticks appear only on centered axes
+ax.xaxis.set_ticks_position('bottom')
+ax.yaxis.set_ticks_position('left')
+
+plt.show()
+plt.show()
