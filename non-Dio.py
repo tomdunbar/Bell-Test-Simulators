@@ -2,7 +2,7 @@
 """
 Created on Sun Mar  8 16:09:56 2026
 
-@author: Gamer
+@author: Tom Dunbar
 """
 
 import numpy as np
@@ -12,13 +12,11 @@ from matplotlib.ticker import MultipleLocator, FuncFormatter
 def f(xprime):
     """
     Non-Diophantine generator (Eq. 57–59 style).
-    Vectorized and numerically safe.
+    Vectorized
     """
-
     x = np.asarray(xprime)
 
     n = np.floor(2* xprime)
-
 
     x = n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*x - n))
 
@@ -29,15 +27,25 @@ def finv(x):
     """
     Inverse generator.
     """
-
     x = np.asarray(x)
 
     n = np.floor(2*x)
-    #print("n  = ", n)
 
     xprime = (n/2) + 1/2*np.sin(np.pi*(x - n/2))**2
 
     return xprime
+
+def circle_plus(x,y):
+    return finv(f(x) + f(y))
+
+def circle_minus(x,y):
+    return finv(f(x) - f(y))
+
+def circle_mul(x,y):
+    return finv(f(x) * f(y))
+
+def circle_div(x,y):
+    return finv(f(x) / f(y))
 
 #Test Numbers based on paper
 # x = [0,1/2,1,np.pi,2*np.pi]
