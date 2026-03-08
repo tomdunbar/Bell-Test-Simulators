@@ -7,7 +7,7 @@ Created on Sun Mar  8 16:09:56 2026
 
 import numpy as np
 import matplotlib.pyplot as plt
-
+from matplotlib.ticker import MultipleLocator, FuncFormatter
 
 def f(xprime):
     """
@@ -50,41 +50,80 @@ def finv(x):
 
 x = np.linspace(-1, 1, 500)
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(6,4))
+
 
 plt.plot(x, finv(x),
          color="tab:blue",
-         linewidth=1,
+         linewidth=2,
          linestyle='--',
          label="x vs x'")
 
 plt.plot(x,x,
          color="tab:red",
-         linewidth=1,
+         linewidth=2,
          label="x vs x")
 
-plt.xlabel(r"x")
-plt.ylabel(r"x'")
+#plt.xlabel(r"x")
+#plt.ylabel(r"x'")
 
+# Journal-style parameters
+plt.rcParams.update({
+    "figure.dpi": 150,
+    "axes.linewidth": 1.2,
+    "font.size": 12,
+})
 
-# ---- Center the axes ----
+# ---- center axes ----
 ax.spines['left'].set_position('zero')
 ax.spines['bottom'].set_position('zero')
-
-# Hide top/right spines
 ax.spines['right'].set_color('none')
 ax.spines['top'].set_color('none')
 
-# ---- Remove grid ----
-ax.grid(False)
+# ---- tick spacing ----
+ax.xaxis.set_major_locator(MultipleLocator(0.5))
+ax.yaxis.set_major_locator(MultipleLocator(0.5))
 
-# ---- Tick marks every 0.5 ----
-ax.xaxis.set_major_locator(0.5)
-ax.yaxis.set_major_locator(0.5)
+ax.xaxis.set_minor_locator(MultipleLocator(0.1))
+ax.yaxis.set_minor_locator(MultipleLocator(0.1))
 
-# Make ticks appear only on centered axes
-ax.xaxis.set_ticks_position('bottom')
-ax.yaxis.set_ticks_position('left')
+# ---- tick label formatting ----
+def tick_formatter(x, pos):
+    if np.isclose(x % 1, 0):
+        return f"{int(x)}"
+    elif np.isclose(x % 0.5, 0):
+        return f"{x:.1f}"
+    return ""
 
-plt.show()
+ax.xaxis.set_major_formatter(FuncFormatter(tick_formatter))
+ax.yaxis.set_major_formatter(FuncFormatter(tick_formatter))
+
+# ---- professional tick styling ----
+ax.tick_params(
+    axis='both',
+    which='major',
+    direction='in',
+    length=7,
+    width=1,
+    top=False,
+    right=False
+)
+
+ax.tick_params(
+    axis='both',
+    which='minor',
+    direction='in',
+    length=4,
+    width=0.8,
+    top=False,
+    right=False
+)
+
+# ---- limits ----
+ax.set_xlim(-1,1)
+ax.set_ylim(-1,1)
+
+plt.legend()
+
+plt.tight_layout()
 plt.show()
