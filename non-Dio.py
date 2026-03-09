@@ -9,54 +9,54 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FuncFormatter
 
-def f(xprime):
+def g(x):
     """
     Non-Diophantine generator (Eq. 57–59 style).
     Vectorized
     """
-    xprime = np.asarray(xprime)
+    x = np.asarray(x)
 
-    n = np.floor(2* xprime)
+    n = np.floor(2* x)
 
-    x = n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*xprime - n))
+    x = n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*x - n))
 
     return x
 
 
-def finv(x):
+def ginv(xprime):
     """
     Inverse generator.
     """
-    x = np.asarray(x)
+    xprime = np.asarray(xprime)
 
-    n = np.floor(2*x)
+    n = np.floor(2*xprime)
 
-    xprime = (n/2) + 1/2*np.sin(np.pi*(x - n/2))**2
+    x = (n/2) + 1/2*np.sin(np.pi*(xprime - n/2))**2
 
-    return xprime
+    return x
 
 def circle_plus(x,y):
-    return finv(f(x) + f(y))
+    return ginv(g(x) + g(y))
 
 def circle_minus(x,y):
-    return finv(f(x) - f(y))
+    return ginv(g(x) - g(y))
 
 def circle_mul(x,y):
-    return finv(f(x) * f(y))
+    return ginv(g(x) * g(y))
 
 def circle_div(x,y):
-    return finv(f(x) / f(y))
+    return ginv(g(x) / g(y))
 
 #Test Numbers based on paper
-# x = [0,1/2,1,np.pi,2*np.pi]
-# xprime = finv(x)
-# print("x = ",x," and x' = ",xprime,"\n")
-# xcalc = f(xprime)
-# print("x' = ",xprime," and x = ",xcalc,"\n")
+x = [0,1/2,1,np.pi,2*np.pi]
+xprime = ginv(x)
+print("x = ",x," and x' = ",xprime,"\n")
+xcalc = f(xprime)
+print("x' = ",xprime," and x = ",xcalc,"\n")
 
 ## Lots of Plots
 
-x = np.linspace(-1, 1, 500)
+x = np.linspace(-1, 2*np.pi, 500)
 
 fig, ax = plt.subplots(figsize=(6,4))
 
@@ -135,3 +135,47 @@ plt.legend()
 
 plt.tight_layout()
 plt.show()
+
+
+
+# ----
+# Origional Model
+
+# def f(xprime):
+#     """
+#     Non-Diophantine generator (Eq. 57–59 style).
+#     Vectorized
+#     """
+#     xprime = np.asarray(xprime)
+
+#     n = np.floor(2* xprime)
+
+#     x = n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*xprime - n))
+
+#     return x
+
+
+# def finv(x):
+#     """
+#     Inverse generator.
+#     """
+#     x = np.asarray(x)
+
+#     n = np.floor(2*x)
+
+#     xprime = (n/2) + 1/2*np.sin(np.pi*(x - n/2))**2
+
+#     return xprime
+
+
+# def circle_plus(x,y):
+#     return finv(f(x) + f(y))
+
+# def circle_minus(x,y):
+#     return finv(f(x) - f(y))
+
+# def circle_mul(x,y):
+#     return finv(f(x) * f(y))
+
+# def circle_div(x,y):
+#     return finv(f(x) / f(y))

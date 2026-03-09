@@ -89,7 +89,7 @@ def finv(x):
 
     n = np.floor(2*x)
 
-    xprime = (n/2) + 1/2*np.sin(np.pi*(x - n/2))**2
+    xprime = (n/2) + 1/2*(np.sin(np.pi*(x - n/2)))**2
 
     return xprime
 
@@ -112,7 +112,7 @@ a = np.random.uniform(0, 2*np.pi, N)
 b = np.random.uniform(0, 2*np.pi, N)
 # Compute delta
 
-delta_ab = (a - b) % (2*np.pi)
+# delta_ab = (a - b) % (2*np.pi)
 
 # ------------------------------------
 # Signed-measure LHV Monte Carlo
@@ -143,7 +143,9 @@ lam = np.random.uniform(0, 2*np.pi, N)
 A = np.sign(np.cos(circle_minus(lam,a)))
 B = -np.sign(np.cos(circle_minus(lam,b)))
 
-E_ND = EXYdelta(A,B,delta_ab, bins)
+delta_cir_ab = circle_minus(a,b) % (2*np.pi)
+
+E_ND = EXYdelta(A,B,delta_cir_ab, bins)
 
 # ------------------------------------
 # Ideal and Monte Carlo results
