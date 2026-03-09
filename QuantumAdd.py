@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Mar  8 10:31:28 2026
-
-@author: Gamer
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -12,6 +5,7 @@ import matplotlib.pyplot as plt
 # Parameters
 # ------------------------------------
 N = 1_000_000       # number of trials
+
 num_bins = 100       # bins for delta histogram
 bins = np.linspace(0, 2*np.pi, num_bins + 1)
 bin_centers = 0.5 * (bins[:-1] + bins[1:])
@@ -21,7 +15,7 @@ def QMtheoryPair(x,y):
 # Quantum singlet outcomes Monte Carlo
 # ------------------------------------
     #collaspe the wavefcn by measuring on x    
-    X = np.random.choice([-1, 1], size=len(x))
+    X = np.random.choice([-1, 1], size=N)
     
     #Probability that X == Y, given x and y
     p_equal = (1 - np.cos(x-y)) / 2
@@ -73,6 +67,44 @@ def EXYdelta(X, Y, delta, bins):
 
     return E
 
+def f(xprime):
+    """
+    Non-Diophantine generator (Eq. 57–59 style).
+    Vectorized
+    """
+    xprime = np.asarray(xprime)
+
+    n = np.floor(2* xprime)
+
+    x = n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*xprime - n))
+
+    return x
+
+
+def finv(x):
+    """
+    Inverse generator.
+    """
+    x = np.asarray(x)
+
+    n = np.floor(2*x)
+
+    xprime = (n/2) + 1/2*np.sin(np.pi*(x - n/2))**2
+
+    return xprime
+
+def circle_plus(x,y):
+    return finv(f(x) + f(y))
+
+def circle_minus(x,y):
+    return finv(f(x) - f(y))
+
+def circle_mul(x,y):
+    return finv(f(x) * f(y))
+
+def circle_div(x,y):
+    return finv(f(x) / f(y))
+
 # ------------------------------------
 # Random measurement angles
 # ------------------------------------
@@ -83,91 +115,84 @@ b = np.random.uniform(0, 2*np.pi, N)
 delta_ab = (a - b) % (2*np.pi)
 
 # ------------------------------------
-#  LHV Monte Carlo with Non-Diophantine arithmetic
+# Signed-measure LHV Monte Carlo
 # ------------------------------------
-
-
-def f(x):
-    """
-    Non-Diophantine generator (Eq. 57–59 style).
-    Vectorized and numerically safe.
-    """
-
-    x = np.asarray(x)
-
-    n = np.floor(x / 2)
-
-    # argument inside sqrt
-    inner = 2*x - n
-
-    # enforce valid domain
-    inner = np.clip(inner, 0.0, 1.0)
-
-    arg = np.sqrt(inner)
-    arg = np.clip(arg, -1.0, 1.0)
-
-    xprime = n/2 + (1/np.pi)*np.arcsin(arg)
-
-    return xprime
-
-
-def finv(y):
-    """
-    Inverse generator.
-    """
-
-    y = np.asarray(y)
-
-    n = np.floor(2*y)
-
-    theta = np.pi*(y - n/2)
-
-    # recover original branch expression
-    inner = np.sin(theta)**2
-
-    x = (n + inner) / 2
-
-    return x
-
+# Local hidden variable angle
+# lam = np.random.uniform(0, 2*np.pi, N)
 
 # Local deterministic responses
-# Local hidden variable angle
-lam = np.random.uniform(0, 2*np.pi, N)
+# A = np.sign(np.cos(lam - a))
+# B = -np.sign(np.cos(lam - b))
 
-lamPrime = f(lam)
+# E_lhv = EXYdelta(A,B,delta_ab, bins)
 
-A = np.sign(np.cos(lam - a))
-B = -np.sign(np.cos(lam - b))
-
-E_lhv = EXYdelta(A,B,delta_ab, bins)
 # ------------------------------------
 # Quantum singlet outcomes Monte Carlo
 # ------------------------------------
-X,Y = QMtheoryPair(a, b)
+# X,Y = QMtheoryPair(a, b)
 
-E_QM = EXYdelta(X,Y,delta_ab , bins)
+# E_QM = EXYdelta(X,Y,delta_ab , bins)
+
+# ------------------------------------
+# Non-Dio Monte Carlo
+# ------------------------------------
+# Local hidden variable angle
+lam = np.random.uniform(0, 2*np.pi, N)
+
+# Local deterministic responses
+A = np.sign(np.cos(circle_minus(lam,a)))
+B = -np.sign(np.cos(circle_minus(lam,b)))
+
+E_ND = EXYdelta(A,B,delta_ab, bins)
 
 # ------------------------------------
 # Ideal and Monte Carlo results
 # ------------------------------------
 delta_fine = np.linspace(0, 2*np.pi, 500)
-
-E_pred = -2/np.pi * np.arcsin(np.cos(delta_fine))  # triangle
-
-E_exp  = -np.cos(delta_fine)
+E_qm_ideal  = -np.cos(delta_fine)
+E_lhv_ideal = -2/np.pi * np.arcsin(np.cos(delta_fine))  # triangle
 
 
-# plot
-plt.figure(figsize=(8,6))
+#1/np.sqrt(2) * np.cos(delta_fine)  
+#correlation is only possible for finite angle sets, such as CHSH
 
-plt.plot(delta_fine, E_pred, label="Predicted (local hidden variable)", linewidth=3)
-plt.plot(delta_fine, E_exp, label="Experiment", linewidth=3)
+plt.figure(figsize=(8,5))
 
-plt.xlabel("a-b")
-plt.ylabel("Correlation ⟨AB⟩")
-plt.title("Bell Test: Prediction vs Experiment")
+# Ideal curves
+plt.plot(delta_fine, E_qm_ideal,
+         color="tab:blue",
+         linewidth=2.5,
+         label="Ideal QM  $-\\cos(a-b)$")
+
+plt.plot(delta_fine, E_lhv_ideal,
+         color="tab:red",
+         linewidth=2.5,
+         label="Typical LHV model")
+
+
+# Monte Carlo points
+# plt.scatter(bin_centers, E_QM,
+#             color="royalblue",
+#             s=25,
+#             alpha=0.8,
+#             label="QM Monte Carlo")
+
+# plt.scatter(bin_centers, E_lhv,
+#             color="firebrick",
+#             s=25,
+#             alpha=0.8,
+#             label="Typical LHV Monte Carlo")
+
+plt.scatter(bin_centers, E_ND,
+            color="green",
+            s=25,
+            alpha=0.8,
+            label="Non-Dio Monte Carlo")
+
+plt.xlabel(r"$a-b$, difference of Alice and Bob's angle")
+plt.ylabel(r"$E(a-b)$")
 
 plt.legend()
-plt.grid(True)
-
+plt.grid(alpha=0.3)
+plt.tight_layout()
 plt.show()

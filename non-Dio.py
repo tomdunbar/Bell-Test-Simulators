@@ -14,11 +14,11 @@ def f(xprime):
     Non-Diophantine generator (Eq. 57–59 style).
     Vectorized
     """
-    x = np.asarray(xprime)
+    xprime = np.asarray(xprime)
 
     n = np.floor(2* xprime)
 
-    x = n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*x - n))
+    x = n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*xprime - n))
 
     return x
 
