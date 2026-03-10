@@ -106,3 +106,33 @@ ax.set_ylabel("average z")
 plt.title("Monte Carlo slice where a ≈ b")
 
 plt.show()
+
+# -------------------------------------------------
+# Extract bins where a + b = 1 (diagonal)
+# -------------------------------------------------
+
+z_diag = np.diag(np.fliplr(z_mean))
+
+# -------------------------------------------------
+# 2D Plot of diagonal slice
+# -------------------------------------------------
+
+fig, ax = plt.subplots(figsize=(6,4))
+
+ax.scatter(centers, z_diag,s=10)
+
+ax.plot(centers, np.ones(len(centers)), color = 'red', linewidth=2, linestyle='--')
+
+# minimal style
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+ax.grid(False)
+
+ax.set_xlabel("bin centers")
+ax.set_ylabel("average z")
+
+plt.title("Diagonal Slice where a + b ≈ 1")
+
+
+ax.set_ylim([0,2])
+plt.show()
