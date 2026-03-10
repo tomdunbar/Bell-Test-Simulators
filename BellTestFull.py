@@ -133,8 +133,12 @@ E_QM = EXYdelta(X,Y,delta_ab , bins)
 # ------------------------------------
 delta_fine = np.linspace(0, 2*np.pi, 500)
 E_qm_ideal  = -np.cos(delta_fine)
-E_lhv_ideal = -2/np.pi * np.arcsin(np.cos(delta_fine))  # triangle
+#E_lhv_ideal = -2/np.pi * np.arcsin(np.cos(delta_fine))  # triangle
 E_lmc_ideal = -2/np.pi * np.cos(delta_fine)  #local max correlation
+
+E_lhv_ideal = 2*delta_fine/np.pi - 1
+
+
 
 #1/np.sqrt(2) * np.cos(delta_fine)  
 #correlation is only possible for finite angle sets, such as CHSH
