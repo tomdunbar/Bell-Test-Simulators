@@ -11,8 +11,7 @@ import matplotlib.pyplot as plt
 
 def g(x):
     """
-    Non-Diophantine generator (Eq. 57–59 style).
-    Vectorized
+    inner to outer
     """
     x = np.asarray(x)
 
@@ -24,15 +23,35 @@ def g(x):
 
 def f(x):
     """
-    Inverse generator.
-    """
-    x = np.asarray(x)
-    #x = x/(2*np.pi)
+    Outer to inner
     
-    n = np.floor(2*x)
+    Original fcn
+    # x = np.asarray(x)
+    # x = x % (2*np.pi)     #restrict to 0 to 2pi
+    # x = x/(2*np.pi)   #normalize to 0 to 1
+    # n = np.floor(2*x)
+    # result =  n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*x - n))
+    # return  (2*np.pi)*result  #return to 0 to 2pi
+    
+    Updated, for cleaner implimentation
+    Instead of computing floor, let modf split: 2x=n+r
+    where:
+        n = integer part
+        r = fractional part
+    and r = 2x - n, which is exactly the quantity inside the square root.
+    
+    """
 
-    result = n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*x - n))
-    return result
+    x = np.asarray(x) % (2*np.pi)  #restrict to 0 to 2pi
+
+    u = x/(2*np.pi)                #normalize to 0 to 1
+
+    r, n = np.modf(2*u)  # r = fractional part, n = integer part
+
+    return np.pi*n + np.arccos(1 - 2*r)  #simplied formula, absorbing the 2*pi
+    
+    
+
 
 
 def circle_plus(x, y):
@@ -63,9 +82,8 @@ r2 = 1
 N = 60
 
 theta = np.linspace(0, 2*np.pi, N, endpoint=False)
-x = theta / (2*np.pi)
 
-theta_transformed = f(x) * 2*np.pi
+theta_transformed = f(theta)
 
 # -------------------------------------------------
 # plot
