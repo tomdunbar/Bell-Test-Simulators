@@ -7,7 +7,7 @@ Created on Sun Mar  8 16:09:56 2026
 
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator, FuncFormatter
+#from matplotlib.ticker import MultipleLocator, FuncFormatter
 
 def g(x):
     """
@@ -17,126 +17,185 @@ def g(x):
     x = np.asarray(x)
 
     n = np.floor(2* x)
-    xprime = n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*x - n))
+    
+    #result = (2*np.pi)*((n/2) + 1/2*(np.sin(np.pi*(x - n/2)))**2)
+    result = (n/2) + 1/2*(np.sin(np.pi*(x - n/2)))**2
+    return result
 
-    return xprime
-
-
-def ginv(xprime):
+def f(x):
     """
     Inverse generator.
     """
-    xprime = np.asarray(xprime)
-    n = np.floor(2*xprime)
+    x = np.asarray(x)
+    #x = x/(2*np.pi)
     
-    x = (n/2) + 1/2*(np.sin(np.pi*(xprime - n/2)))**2
-    
-    return x
+    n = np.floor(2*x)
 
-def circle_plus(x,y):
+    result = n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*x - n))
+    return result
 
-def circle_plus(x,y):    
-    return ginv(g(x) + g(y))
+
+def circle_plus(x, y):
+    return g(f(x) + f(y))
 
 def circle_minus(x,y):
-    return ginv(g(x) - g(y))
+    return g(f(x) - f(y))
 
 def circle_mul(x,y):
-    return ginv(g(x) * g(y))
+    return g(f(x) * f(y))
 
 def circle_div(x,y):
-    return ginv(g(x) / g(y))
+    return g(f(x) / f(y))
 
 #Test Numbers based on paper
 # x = [0,1/2,1,np.pi,2*np.pi]
-
-
-# xprime = ginv(x)
+# xprime = g(x)
 # print("x = ",x," and x' = ",xprime,"\n")
-# xcalc = g(xprime)
+# xcalc = f(xprime)
 # print("x' = ",xprime," and x = ",xcalc,"\n")
+
+# -------------------------------------------------
+# parameters
+# -------------------------------------------------
+
+r1 = 0.75
+r2 = 1
+N = 60
+
+theta = np.linspace(0, 2*np.pi, N, endpoint=False)
+x = theta / (2*np.pi)
+
+theta_transformed = f(x) * 2*np.pi
+
+# -------------------------------------------------
+# plot
+# -------------------------------------------------
+
+fig = plt.figure(figsize=(7,7))
+ax = fig.add_subplot(111, projection='polar')
+
+# circles
+t = np.linspace(0, 2*np.pi, 400)
+ax.plot(t, np.full_like(t, r2), linewidth=1, color="black")
+ax.plot(t, np.full_like(t, r1), linewidth=1, color="black")
+
+# connecting lines
+for i in range(N):
+    ax.plot(
+        [theta[i], theta_transformed[i]],
+        [r2, r1],
+        linewidth=1,
+        alpha=0.7,
+        color="grey"
+    )
+
+
+
+# outer points
+ax.scatter(theta, np.full_like(theta, r2), s=50)
+
+# transformed points
+ax.scatter(theta_transformed, np.full_like(theta_transformed, r1), s=50)
+
+# minimal style
+ax.spines['polar'].set_visible(False)
+
+ax.grid(True)
+ax.set_theta_zero_location("E")
+ax.set_thetagrids([0,90,180,270])
+ax.xaxis.grid(True, alpha=0.3)
+#ax.set_xticklabels([])
+
+ax.yaxis.grid(False)
+ax.set_yticklabels([])
+ax.set_ylim([0,1.2])
+
+plt.title("Circle Mapping via f(x)")
+plt.show()
 
 ## Lots of Plots
 
-x = np.linspace(-1, 2*np.pi, 500)
+# x = np.linspace(0, 2*np.pi, 500)
 
-fig, ax = plt.subplots(figsize=(6,4))
+# fig, ax = plt.subplots(figsize=(6,4))
 
 
-plt.plot(x, ginv(x),
-         color="tab:blue",
-         linewidth=2,
-         linestyle='--',
-         label="x vs x'")
+# # ---- limits ----
+# ax.set_xlim(0,1)
+# ax.set_ylim(0,1)
 
-plt.plot(x,x,
-         color="tab:red",
-         linewidth=2,
-         label="x vs x")
+# #--- Plots----
+# plt.plot(x, f(x),
+#          color="tab:blue",
+#          linewidth=2,
+#          linestyle='--',
+#          label="x vs x'")
 
-#plt.xlabel(r"x")
-#plt.ylabel(r"x'")
+# plt.plot(x,x,
+#          color="tab:red",
+#          linewidth=2,
+#          label="x vs x")
 
-# Journal-style parameters
-plt.rcParams.update({
-    "figure.dpi": 150,
-    "axes.linewidth": 1.2,
-    "font.size": 12,
-})
+# #plt.xlabel(r"x")
+# #plt.ylabel(r"x'")
 
-# ---- center axes ----
-ax.spines['left'].set_position('zero')
-ax.spines['bottom'].set_position('zero')
-ax.spines['right'].set_color('none')
-ax.spines['top'].set_color('none')
+# # Journal-style parameters
+# plt.rcParams.update({
+#     "figure.dpi": 150,
+#     "axes.linewidth": 1.2,
+#     "font.size": 12,
+# })
 
-# ---- tick spacing ----
-ax.xaxis.set_major_locator(MultipleLocator(0.5))
-ax.yaxis.set_major_locator(MultipleLocator(0.5))
+# # ---- center axes ----
+# ax.spines['left'].set_position('zero')
+# ax.spines['bottom'].set_position('zero')
+# ax.spines['right'].set_color('none')
+# ax.spines['top'].set_color('none')
 
-ax.xaxis.set_minor_locator(MultipleLocator(0.1))
-ax.yaxis.set_minor_locator(MultipleLocator(0.1))
+# # ---- tick spacing ----
+# ax.xaxis.set_major_locator(MultipleLocator(0.5))
+# ax.yaxis.set_major_locator(MultipleLocator(0.5))
 
-# ---- tick label formatting ----
-def tick_formatter(x, pos):
-    if np.isclose(x % 1, 0):
-        return f"{int(x)}"
-    elif np.isclose(x % 0.5, 0):
-        return f"{x:.1f}"
-    return ""
+# ax.xaxis.set_minor_locator(MultipleLocator(0.1))
+# ax.yaxis.set_minor_locator(MultipleLocator(0.1))
 
-ax.xaxis.set_major_formatter(FuncFormatter(tick_formatter))
-ax.yaxis.set_major_formatter(FuncFormatter(tick_formatter))
+# # ---- tick label formatting ----
+# def tick_formatter(x, pos):
+#     if np.isclose(x % 1, 0):
+#         return f"{int(x)}"
+#     elif np.isclose(x % 0.5, 0):
+#         return f"{x:.1f}"
+#     return ""
 
-# ---- professional tick styling ----
-ax.tick_params(
-    axis='both',
-    which='major',
-    direction='in',
-    length=7,
-    width=1,
-    top=False,
-    right=False
-)
+# ax.xaxis.set_major_formatter(FuncFormatter(tick_formatter))
+# ax.yaxis.set_major_formatter(FuncFormatter(tick_formatter))
 
-ax.tick_params(
-    axis='both',
-    which='minor',
-    direction='in',
-    length=4,
-    width=0.8,
-    top=False,
-    right=False
-)
+# # ---- professional tick styling ----
+# ax.tick_params(
+#     axis='both',
+#     which='major',
+#     direction='in',
+#     length=7,
+#     width=1,
+#     top=False,
+#     right=False
+# )
 
-# ---- limits ----
-ax.set_xlim(-1,2*np.pi)
-ax.set_ylim(-1,2*np.pi)
+# ax.tick_params(
+#     axis='both',
+#     which='minor',
+#     direction='in',
+#     length=4,
+#     width=0.8,
+#     top=False,
+#     right=False
+# )
 
-plt.legend()
 
-plt.tight_layout()
-plt.show()
+# plt.legend()
+
+# plt.tight_layout()
+# plt.show()
 
 
 
