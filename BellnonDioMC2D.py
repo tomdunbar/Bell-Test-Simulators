@@ -9,13 +9,62 @@ import numpy as np
 import matplotlib.pyplot as plt
 #from mpl_toolkits.mplot3d import Axes3D
 
+# def f(x):
+#     result = np.arctanh(x/(2*np.pi))
+#     return result
+
+# def g(x):
+#     result = 2*np.pi*np.tanh(x)
+#     return result
+
+
 def f(x):
-    result = np.arctanh(x/(2*np.pi))
-    return result
+    """
+    Outer to inner
+    
+    Original fcn
+    # x = np.asarray(x)
+    # x = x % (2*np.pi)     #restrict to 0 to 2pi
+    # x = x/(2*np.pi)   #normalize to 0 to 1
+    # n = np.floor(2*x)
+    # result =  n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*x - n))
+    # return  (2*np.pi)*result  #return to 0 to 2pi
+    
+    Updated, for cleaner implimentation
+    Instead of computing floor, let modf split: 2x=n+r
+    where:
+        n = integer part
+        r = fractional part
+    and r = 2x - n, which is exactly the quantity inside the square root.
+    """
+
+    x = np.asarray(x) % (2*np.pi)  #restrict to 0 to 2pi
+
+    u = x/(2*np.pi)                #normalize to 0 to 1
+    r, n = np.modf(2*u)  # r = fractional part, n = integer part
+
+    return np.pi*n + np.arccos(1 - 2*r)  #simplied formula, absorbing the 2*pi
 
 def g(x):
-    result = 2*np.pi*np.tanh(x)
-    return result
+    """
+    inner to outer
+    
+    Original fcn
+    x = np.asarray(x) % (2*np.pi)  #restrict to 0 to 2pi
+    x = x/(2*np.pi)                #normalize to 0 to 1
+    n = np.floor(2* x)
+    result = (2*np.pi)*((n/2) + 1/2*(np.sin(np.pi*(x - n/2)))**2)
+    """
+    x = np.asarray(x) % (2*np.pi)
+
+    n = np.floor(x/np.pi)
+    r = (x - np.pi*n)/np.pi
+
+    return np.pi*n + np.pi*(1 - np.cos(np.pi*r))/2
+
+def circle_minus(x,y):
+    return g(f(x) - f(y))
+
 
 def QMtheoryPair(x,y):
 # ------------------------------------
@@ -34,6 +83,9 @@ def QMtheoryPair(x,y):
     
     return X,Y
 
+# ------------------------------------
+# Local Deterministic outcome
+# ------------------------------------
 def LocalDeterm(theta):
     return np.sign(np.cos(theta))
 
@@ -54,12 +106,14 @@ b = np.random.uniform(0, 2*np.pi, N)
 #z = A*B
 
 # Local deterministic responses for testing
-A = LocalDeterm(lam - a)
-B = LocalDeterm(lam + np.pi  - b)
-z = A*B
+#A = LocalDeterm(lam - a)
+#B = LocalDeterm(lam + np.pi  - b)
+#z = A*B
 
 # Non-Dio function
-#z = g(f(a) + f(b))
+A = LocalDeterm(circle_minus(lam,a))
+B = LocalDeterm(circle_minus(lam + np.pi,b))
+z = A*B
 
 
 
@@ -128,7 +182,7 @@ ax.set_xlabel("a")
 ax.set_ylabel("b")
 ax.set_zlabel("avg z")
 
-plt.title("Monte Carlo Estimate of z = g(f(a)+f(b))")
+plt.title("Monte Carlo Estimate")
 
 ax.set_zlabel("avg z")
 
