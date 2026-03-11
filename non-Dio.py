@@ -36,11 +36,10 @@ def f(x):
     x = np.asarray(x) % (2*np.pi)  #restrict to 0 to 2pi
 
     u = x/(2*np.pi)                #normalize to 0 to 1
-
     r, n = np.modf(2*u)  # r = fractional part, n = integer part
 
     return np.pi*n + np.arccos(1 - 2*r)  #simplied formula, absorbing the 2*pi
- 
+
 def g(x):
     """
     inner to outer
@@ -51,15 +50,12 @@ def g(x):
     n = np.floor(2* x)
     result = (2*np.pi)*((n/2) + 1/2*(np.sin(np.pi*(x - n/2)))**2)
     """
-
     x = np.asarray(x) % (2*np.pi)
 
-    u = x/(2*np.pi)
+    n = np.floor(x/np.pi)
+    r = (x - np.pi*n)/np.pi
 
-    r, n = np.modf(2*u)
-
-    return np.pi*n + np.pi*(1 - np.cos(2*np.pi*r))/2 
-
+    return np.pi*n + np.pi*(1 - np.cos(np.pi*r))/2
 
 
 def circle_plus(x, y):
@@ -72,7 +68,9 @@ def circle_mul(x,y):
     return g(f(x) * f(y))
 
 def circle_div(x,y):
-    return g(f(x) / f(y))
+    fy = f(y)
+    fy = np.where(np.abs(fy) < 1e-10, np.nan, fy)
+    return g(f(x) / fy)
 
 #Test Numbers based on paper
 # x = [0,1/2,1,np.pi,2*np.pi]
@@ -163,7 +161,7 @@ fig = plt.figure(figsize=(7,7))
 ax = fig.add_subplot(111, projection='polar')
 
 # circles
-#t = np.linspace(0, 2*np.pi, 400)
+t = np.linspace(0, 2*np.pi, 400)
 ax.plot(t, np.full_like(t, r2), linewidth=1, color="black")
 ax.plot(t, np.full_like(t, r1), linewidth=1, color="black")
 
@@ -208,7 +206,7 @@ plt.show()
 
 
 # -------------------------------------------------
-# cartiesian plot confirming f(x),  g(x), and g(f(x))
+# Cartesian plot confirming f(x),  g(x), and g(f(x))
 # -------------------------------------------------
 
 x = np.linspace(0, 2*np.pi, 500)
