@@ -34,20 +34,34 @@ def QMtheoryPair(x,y):
     
     return X,Y
 
-N = 2_000_000        # Monte Carlo samples
-nbins = 40           # grid resolution
+def LocalDeterm(theta):
+    return np.sign(np.cos(theta))
+
+N = 3_000_000        # Monte Carlo samples
+nbins = 60           # grid resolution
 
 # -------------------------------------------------
 # Monte Carlo draw
 # -------------------------------------------------
 
-#a = np.random.rand(N)
-#b = np.random.rand(N)
+lam = np.random.uniform(0, 2*np.pi, N)
 
 a = np.random.uniform(0, 2*np.pi, N)
 b = np.random.uniform(0, 2*np.pi, N)
 
-z = g(f(a) + f(b))
+#QM theory for testing
+#A, B = QMtheoryPair(a,b)
+#z = A*B
+
+# Local deterministic responses for testing
+A = LocalDeterm(lam - a)
+B = LocalDeterm(lam + np.pi  - b)
+z = A*B
+
+# Non-Dio function
+#z = g(f(a) + f(b))
+
+
 
 # -------------------------------------------------
 # Bin edges
@@ -73,7 +87,7 @@ centers = 0.5*(edges[:-1] + edges[1:])
 A,B = np.meshgrid(centers,centers)
 
 # -------------------------------------------------
-# ideal surface
+# ideal -cos(delta) surface
 # -------------------------------------------------
 k = 200
 m = np.linspace(0,0.999,k)*2*np.pi
@@ -134,9 +148,11 @@ z_diag = np.diag(np.fliplr(z_mean))
 
 fig, ax = plt.subplots(figsize=(6,4))
 
-ax.scatter(centers, z_diag,s=10)
+ax.plot(centers, z_diag, marker='o', markersize=5, linestyle='-')
 
-ax.plot(centers, -np.cos(centers), color = 'red', linewidth=2, linestyle='--')
+
+ax.plot(m, np.diag(np.fliplr(Z_ideal)),color = 'red', linewidth=2)
+#ax.plot(centers, -np.cos(2*centers), color = 'red', linewidth=2, linestyle='--')
 #ax.plot(centers, 2*np.pi*np.ones(len(centers)), color = 'red', linewidth=2, linestyle='--')
 
 # minimal style
@@ -150,5 +166,5 @@ ax.set_ylabel("average z")
 plt.title("Diagonal Slice where a + b ≈ 2 pi")
 
 
-ax.set_ylim([-1.1,7])
+ax.set_ylim([-1.1,1.1])
 plt.show()
