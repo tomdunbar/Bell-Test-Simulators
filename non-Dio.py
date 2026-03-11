@@ -30,7 +30,6 @@ def f(x):
         n = integer part
         r = fractional part
     and r = 2x - n, which is exactly the quantity inside the square root.
-    
     """
 
     x = np.asarray(x) % (2*np.pi)  #restrict to 0 to 2pi
@@ -209,7 +208,7 @@ plt.show()
 # Cartesian plot confirming f(x),  g(x), and g(f(x))
 # -------------------------------------------------
 
-x = np.linspace(0, 2*np.pi, 500)
+x = np.linspace(0, 2*np.pi, 500, endpoint=False)
 
 fig, ax = plt.subplots(figsize=(6,4))
 
