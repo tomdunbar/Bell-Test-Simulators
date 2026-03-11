@@ -37,8 +37,8 @@ def QMtheoryPair(x,y):
 def LocalDeterm(theta):
     return np.sign(np.cos(theta))
 
-N = 3_000_000        # Monte Carlo samples
-nbins = 60           # grid resolution
+N = 2_500_000        # Monte Carlo samples
+nbins = 50           # grid resolution
 
 # -------------------------------------------------
 # Monte Carlo draw
@@ -152,8 +152,6 @@ ax.plot(centers, z_diag, marker='o', markersize=5, linestyle='-')
 
 
 ax.plot(m, np.diag(np.fliplr(Z_ideal)),color = 'red', linewidth=2)
-#ax.plot(centers, -np.cos(2*centers), color = 'red', linewidth=2, linestyle='--')
-#ax.plot(centers, 2*np.pi*np.ones(len(centers)), color = 'red', linewidth=2, linestyle='--')
 
 # minimal style
 ax.spines["top"].set_visible(False)
