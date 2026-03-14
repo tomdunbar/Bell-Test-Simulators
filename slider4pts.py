@@ -38,7 +38,7 @@ t = np.linspace(0,2*np.pi,400)
 ax.plot(t, np.full_like(t,r_outer), lw=2)
 ax.plot(t, np.full_like(t,r_inner), lw=2)
 
-# minimal style
+# styling
 ax.spines['polar'].set_visible(False)
 ax.grid(True)
 ax.set_theta_zero_location("E")
@@ -66,7 +66,7 @@ outer_angles = np.array([
 mapped = f(outer_angles)
 
 # --------------------------------------------------
-# artists (created once)
+# artists
 # --------------------------------------------------
 
 outer_pts = []
@@ -94,27 +94,28 @@ for a_out, a_in, c in zip(outer_angles, mapped, colors):
 
     arrows.append(arrow)
 
-
-# alpha / beta arrows
+# --------------------------------------------------
+# alpha / beta arrows (from origin)
 # --------------------------------------------------
 
 alpha_arrow = ax.annotate(
-    "α",
+    "",
     xy=(alpha,1.15),
-    xytext=(alpha,1.22),
-    arrowprops=dict(arrowstyle="->", linestyle="--", color="red", lw=2),
-    color="red",
-    ha="center"
+    xytext=(alpha,0),
+    arrowprops=dict(arrowstyle="->", linestyle="--", color="red", lw=2)
 )
 
 beta_arrow = ax.annotate(
-    "β",
+    "",
     xy=(beta,1.15),
-    xytext=(beta,1.22),
-    arrowprops=dict(arrowstyle="->", linestyle="--", color="blue", lw=2),
-    color="blue",
-    ha="center"
+    xytext=(beta,0),
+    arrowprops=dict(arrowstyle="->", linestyle="--", color="blue", lw=2)
 )
+
+# labels at arrow tips
+alpha_label = ax.text(alpha,1.22,"α",color="red",ha="center",va="center")
+beta_label  = ax.text(beta,1.22,"β",color="blue",ha="center",va="center")
+
 # --------------------------------------------------
 # update
 # --------------------------------------------------
@@ -143,11 +144,16 @@ def update(alpha_deg):
         arrows[i].set_position((a_out,r_outer))
         arrows[i].xy = (a_in,r_inner)
 
+    # update alpha beta arrows
     alpha_arrow.xy = (alpha,1.15)
-    alpha_arrow.set_position((alpha,1.22))
-    
-    beta_arrow.xy  = (beta,1.15)
-    beta_arrow.set_position((beta,1.22))
+    alpha_arrow.set_position((alpha,0))
+
+    beta_arrow.xy = (beta,1.15)
+    beta_arrow.set_position((beta,0))
+
+    # update labels
+    alpha_label.set_position((alpha,1.22))
+    beta_label.set_position((beta,1.22))
 
     fig.canvas.draw_idle()
 
