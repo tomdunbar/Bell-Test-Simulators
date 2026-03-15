@@ -21,32 +21,53 @@ from matplotlib.widgets import Slider
 # mapping function producing cosine-law averages
 # --------------------------------------------------
 
+# def f(x):
+#     """
+#     Nonlinear angular warp that maps a uniform angle x
+#     into a distribution that reproduces the cosine law
+#     after averaging circular differences.
+
+#     Works with scalars or numpy arrays.
+#     """
+
+#     x = np.asarray(x)
+
+#     # wrap input angle to [0, 2π)
+#     x = np.mod(x, 2*np.pi)
+
+#     # normalized position around circle
+#     u = x/(2*np.pi)
+
+#     # split the circle into two mirrored halves
+#     r, n = np.modf(2*u)
+
+#     # nonlinear warp
+#     y = np.arccos(1 - 2*r)
+
+#     # shift the second half by π
+#     return np.pi*n + y
+
+
 def f(x):
     """
-    Nonlinear angular warp that maps a uniform angle x
-    into a distribution that reproduces the cosine law
-    after averaging circular differences.
+    Smooth circle warp that approximates the
+    cosine correlation when used in the
+    angular-difference averaging model.
 
     Works with scalars or numpy arrays.
     """
 
     x = np.asarray(x)
 
-    # wrap input angle to [0, 2π)
+    # wrap angle
     x = np.mod(x, 2*np.pi)
 
-    # normalized position around circle
-    u = x/(2*np.pi)
+    # tunable warp strength
+    a = 0.28
 
-    # split the circle into two mirrored halves
-    r, n = np.modf(2*u)
+    y = x + a*np.sin(2*x)
 
-    # nonlinear warp
-    y = np.arccos(1 - 2*r)
-
-    # shift the second half by π
-    return np.pi*n + y
-
+    return np.mod(y, 2*np.pi)
 
 
 
