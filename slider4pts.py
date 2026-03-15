@@ -8,13 +8,54 @@ from matplotlib.widgets import Slider
 # mapping function
 # --------------------------------------------------
 
-def f(x):
-    x = np.asarray(x) % (2*np.pi)
+# def f(x):
+#     x = np.asarray(x) % (2*np.pi)
 
+#     u = x/(2*np.pi)
+#     r, n = np.modf(2*u)
+
+#     return np.pi*n + np.arccos(1 - 2*r)
+
+
+# --------------------------------------------------
+# mapping function producing cosine-law averages
+# --------------------------------------------------
+
+def f(x):
+    """
+    Nonlinear angular warp that maps a uniform angle x
+    into a distribution that reproduces the cosine law
+    after averaging circular differences.
+
+    Works with scalars or numpy arrays.
+    """
+
+    x = np.asarray(x)
+
+    # wrap input angle to [0, 2π)
+    x = np.mod(x, 2*np.pi)
+
+    # normalized position around circle
     u = x/(2*np.pi)
+
+    # split the circle into two mirrored halves
     r, n = np.modf(2*u)
 
-    return np.pi*n + np.arccos(1 - 2*r)
+    # nonlinear warp
+    y = np.arccos(1 - 2*r)
+
+    # shift the second half by π
+    return np.pi*n + y
+
+
+
+
+# --------------------------------------------------
+# circular angle difference
+# --------------------------------------------------
+
+def angdiff(a, b):
+    return np.abs(np.arctan2(np.sin(a-b), np.cos(a-b)))
 
 # --------------------------------------------------
 # parameters
@@ -25,6 +66,20 @@ r_inner = 0.75
 
 alpha0 = 52.2
 colors = ["red","red","blue","blue"]
+
+delta = np.deg2rad(22.5)
+
+alpha = np.linspace(0,2*np.pi,100000)
+beta  = alpha - delta
+
+d1 = angdiff(f(alpha + np.pi/2), f(beta + np.pi/2))
+d2 = angdiff(f(alpha - np.pi/2), f(beta - np.pi/2))
+
+p = np.mean((d1+d2)/(2*np.pi))
+
+print("numerical average:", p)
+print("target:", (1-np.cos(delta))/2)
+
 
 # --------------------------------------------------
 # figure
@@ -172,5 +227,77 @@ slider = Slider(
 )
 
 slider.on_changed(update)
+
+plt.show()
+
+# --------------------------------------------------
+# second plot: probability vs alpha
+# --------------------------------------------------
+
+alpha_vals = np.linspace(0,2*np.pi,1000)
+delta = np.deg2rad(22.5)
+
+beta_vals = alpha_vals - delta
+
+d1 = angdiff(
+    f(alpha_vals + np.pi/2),
+    f(beta_vals + np.pi/2)
+)
+
+d2 = angdiff(
+    f(alpha_vals - np.pi/2),
+    f(beta_vals - np.pi/2)
+)
+
+vals = (d1 + d2) / (2*np.pi)
+
+avg_val = np.mean(vals)
+
+qm_val = (1 - np.cos(delta)) / 2
+
+fig2, ax2 = plt.subplots(figsize=(7,4))
+
+ax2.plot(alpha_vals, vals, lw=2, label="calculated")
+
+ax2.axhline(
+    avg_val,
+    linestyle="--",
+    lw=2,
+    label=f"average = {avg_val:.5f}"
+)
+
+ax2.axhline(
+    qm_val,
+    linestyle=":",
+    lw=2,
+    color="red",
+    label=f"(1-cos(22.5°))/2 = {qm_val:.5f}"
+)
+
+# limits
+ax2.set_xlim(0,2*np.pi)
+
+# ---- nice angular ticks ----
+xticks = [0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi]
+xtick_labels = [
+    "0",
+    r"$\frac{\pi}{2}$",
+    r"$\pi$",
+    r"$\frac{3\pi}{2}$",
+    r"$2\pi$"
+]
+
+ax2.set_xticks(xticks)
+ax2.set_xticklabels(xtick_labels)
+
+# labels
+ax2.set_xlabel(r"$\alpha$")
+ax2.set_ylabel("value")
+
+ax2.set_title("Computed value vs α")
+
+ax2.legend()
+
+ax2.grid(True, alpha=0.3)
 
 plt.show()
