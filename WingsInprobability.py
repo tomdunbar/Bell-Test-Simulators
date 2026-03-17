@@ -30,10 +30,10 @@ from matplotlib.widgets import Slider
 # --------------------------------------------------
 
 def g(x):
-    return (np.pi/4) * np.sin(2*x)
+     return (np.pi/-4) * np.sin(2*x)
 
-# def g(x):
-#     return -(2/4) * np.arccos(np.sin(2*x)) + np.pi/4
+#def g(x):
+#    return -(1/2) * np.arccos(np.sin(2*x)) + np.pi/4
 
 
 # --------------------------------------------------
@@ -301,5 +301,79 @@ ax2.set_title("Computed probability vs α")
 ax2.legend()
 
 ax2.grid(True, alpha=0.3)
+
+plt.show()
+
+# --------------------------------------------------
+# third plot: average probability vs delta
+# --------------------------------------------------
+
+# delta grid
+delta_vals = np.linspace(0, 2*np.pi, 200)
+
+# integration grid
+alpha_vals = np.linspace(0, 2*np.pi, 4000)
+
+# preallocate (faster)
+avg_probs = np.zeros_like(delta_vals)
+
+# compute averages
+for i, delta in enumerate(delta_vals):
+
+    beta_vals = alpha_vals - delta
+
+    vals = probability(alpha_vals, beta_vals)
+
+    avg_probs[i] = np.mean(vals)
+
+
+# --------------------------------------------------
+# reference curves
+# --------------------------------------------------
+
+# QM probability of SAME result
+qm_curve = -1/2 *(1 + np.cos(delta_vals)) / 2 + 1/2
+
+# triangle wave between 0 and 1
+triangle_curve = -1/2*np.abs((delta_vals % (2*np.pi)) - np.pi) / np.pi +1/2
+
+
+# --------------------------------------------------
+# plot
+# --------------------------------------------------
+
+fig3, ax3 = plt.subplots(figsize=(7,4))
+
+ax3.plot(delta_vals, avg_probs,
+         lw=2,
+         label="model")
+
+ax3.plot(delta_vals, qm_curve,
+         lw=2,
+         linestyle="--",
+         label="QM same probability")
+
+ax3.plot(delta_vals, triangle_curve,
+         lw=2,
+         linestyle=":",
+         label="triangle δ")
+
+# axis formatting
+ax3.set_xlim(0,2*np.pi)
+
+xticks = [0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi]
+xtick_labels = ["0", r"$\frac{\pi}{2}$", r"$\pi$", r"$\frac{3\pi}{2}$", r"$2\pi$"]
+
+ax3.set_xticks(xticks)
+ax3.set_xticklabels(xtick_labels)
+
+ax3.set_xlabel(r"$\delta$")
+ax3.set_ylabel("average probability")
+
+ax3.set_title("Average probability vs δ")
+
+ax3.legend()
+
+ax3.grid(True, alpha=0.3)
 
 plt.show()
