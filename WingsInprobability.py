@@ -12,10 +12,10 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 
 # --------------------------------------------------
-# nonlinear mapping (your original mapping)
+# nonlinear mapping (original mapping)
 # --------------------------------------------------
 
-# def f(x):
+# def g(x):
 #     x = np.asarray(x) % (2*np.pi)
 
 #     u = x/(2*np.pi)
@@ -30,7 +30,7 @@ from matplotlib.widgets import Slider
 # --------------------------------------------------
 
 def g(x):
-     return (np.pi/-4) * np.sin(2*x)
+     return (np.pi/3) * np.sin(2*x + pi/4)
 
 #def g(x):
 #    return -(1/2) * np.arccos(np.sin(2*x)) + np.pi/4
