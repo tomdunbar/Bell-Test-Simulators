@@ -30,7 +30,7 @@ from matplotlib.widgets import Slider
 # --------------------------------------------------
 
 def g(x):
-     return (np.pi/3) * np.sin(2*x + np.pi/4)
+     return (np.pi/3) * np.sin(2*x)
 
 #def g(x):
 #    return -(1/2) * np.arccos(np.sin(2*x)) + np.pi/4
