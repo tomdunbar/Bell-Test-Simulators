@@ -84,8 +84,24 @@ delta_ab = (a - b) % (2*np.pi)
 lam = np.random.uniform(0, 2*np.pi, N)
 
 # Local deterministic responses
-A = np.sign(np.cos(lam - a))
-B = np.sign(np.cos(lam + np.pi  - b))
+#A = np.sign(np.cos(lam - a))
+#B = np.sign(np.cos(lam + np.pi  - b))
+
+#local probablistic response
+
+def lpr(x,y):
+    #Probability that X == Y, given x and y
+    p_equal = np.abs(np.cos(x-y)/2 + 1/2)
+    
+    rn = np.random.uniform(0, 1, N)  #random number
+    # If rn < p_equal → Y = X
+    # else → Y = -X
+    X = np.where(rn < p_equal, 1, -1)
+    return X
+
+A = lpr(lam,a)
+B = lpr(lam+np.pi,b)
+
 
 E_lhv = EXYdelta(A,B,delta_ab, bins)
 
