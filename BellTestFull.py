@@ -89,18 +89,20 @@ lam = np.random.uniform(0, 2*np.pi, N)
 
 #local probablistic response
 
-def lpr(x,y):
+def lpr(x,y,rn):
     #Probability that X == Y, given x and y
     p_equal = np.abs(np.cos(x-y)/2 + 1/2)
     
-    rn = np.random.uniform(0, 1, N)  #random number
+
     # If rn < p_equal → Y = X
     # else → Y = -X
     X = np.where(rn < p_equal, 1, -1)
     return X
 
-A = lpr(lam,a)
-B = lpr(lam+np.pi,b)
+rn = np.random.uniform(0, 1, N)  #shared random number
+
+A = lpr(lam,a, rn)
+B = -1*lpr(lam,b, rn)
 
 
 E_lhv = EXYdelta(A,B,delta_ab, bins)
