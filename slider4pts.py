@@ -223,6 +223,8 @@ avg_val = np.mean(vals)
 
 qm_val = (1 - np.cos(delta)) / 2
 
+LHV_val = (delta)/2
+
 fig2, ax2 = plt.subplots(figsize=(7,4))
 
 ax2.plot(alpha_vals, vals, lw=2, label="calculated")
@@ -233,6 +235,15 @@ ax2.axhline(
     lw=2,
     label=f"average = {avg_val:.5f}"
 )
+
+ax2.axhline(
+    LHV_val,
+    linestyle="-.",
+    lw=2,
+    color="red",
+    label=f"22.5°/2 = {LHV_val:.5f}"
+)
+
 
 ax2.axhline(
     qm_val,

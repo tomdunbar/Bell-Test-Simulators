@@ -247,50 +247,68 @@ ax.spines['bottom'].set_position('zero')
 ax.spines['right'].set_color('none')
 ax.spines['top'].set_color('none')
 
-# ---- tick spacing ----
-ax.xaxis.set_major_locator(MultipleLocator(0.5))
-ax.yaxis.set_major_locator(MultipleLocator(0.5))
 
-ax.xaxis.set_minor_locator(MultipleLocator(0.1))
-ax.yaxis.set_minor_locator(MultipleLocator(0.1))
+Piticks = [0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi]
+Pitick_labels = [
+    "0",
+    r"$\frac{\pi}{2}$",
+    r"$\pi$",
+    r"$\frac{3\pi}{2}$",
+    r"$2\pi$"
+]
 
-# ---- tick label formatting ----
-def tick_formatter(x, pos):
-    if np.isclose(x % 1, 0):
-        return f"{int(x)}"
-    elif np.isclose(x % 0.5, 0):
-        return f"{x:.1f}"
-    return ""
+ax.set_xticks(Piticks)
+ax.set_xticklabels(Pitick_labels)
 
-ax.xaxis.set_major_formatter(FuncFormatter(tick_formatter))
-ax.yaxis.set_major_formatter(FuncFormatter(tick_formatter))
-
-# ---- professional tick styling ----
-ax.tick_params(
-    axis='both',
-    which='major',
-    direction='in',
-    length=7,
-    width=1,
-    top=False,
-    right=False
-)
-
-ax.tick_params(
-    axis='both',
-    which='minor',
-    direction='in',
-    length=4,
-    width=0.8,
-    top=False,
-    right=False
-)
-
+ax.set_yticks(Piticks)
+ax.set_yticklabels(Pitick_labels)
 
 plt.legend()
 
 plt.tight_layout()
 plt.show()
+
+
+# # ---- tick spacing ----
+# ax.xaxis.set_major_locator(MultipleLocator(0.5))
+# ax.yaxis.set_major_locator(MultipleLocator(0.5))
+
+# ax.xaxis.set_minor_locator(MultipleLocator(0.1))
+# ax.yaxis.set_minor_locator(MultipleLocator(0.1))
+
+# # ---- tick label formatting ----
+# def tick_formatter(x, pos):
+#     if np.isclose(x % 1, 0):
+#         return f"{int(x)}"
+#     elif np.isclose(x % 0.5, 0):
+#         return f"{x:.1f}"
+#     return ""
+
+# ax.xaxis.set_major_formatter(FuncFormatter(tick_formatter))
+# ax.yaxis.set_major_formatter(FuncFormatter(tick_formatter))
+
+# # ---- professional tick styling ----
+# ax.tick_params(
+#     axis='both',
+#     which='major',
+#     direction='in',
+#     length=7,
+#     width=1,
+#     top=False,
+#     right=False
+# )
+
+# ax.tick_params(
+#     axis='both',
+#     which='minor',
+#     direction='in',
+#     length=4,
+#     width=0.8,
+#     top=False,
+#     right=False
+# )
+
+
 
 
 
