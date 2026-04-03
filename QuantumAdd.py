@@ -10,22 +10,22 @@ num_bins = 100       # bins for delta histogram
 bins = np.linspace(0, 2*np.pi, num_bins + 1)
 bin_centers = 0.5 * (bins[:-1] + bins[1:])
 
-def QMtheoryPair(x,y):
-# ------------------------------------
-# Quantum singlet outcomes Monte Carlo
-# ------------------------------------
-    #collaspe the wavefcn by measuring on x    
-    X = np.random.choice([-1, 1], size=N)
+# def QMtheoryPair(x,y):
+# # ------------------------------------
+# # Quantum singlet outcomes Monte Carlo
+# # ------------------------------------
+#     #collaspe the wavefcn by measuring on x    
+#     X = np.random.choice([-1, 1], size=N)
     
-    #Probability that X == Y, given x and y
-    p_equal = (1 - np.cos(x-y)) / 2
+#     #Probability that X == Y, given x and y
+#     p_equal = (1 - np.cos(x-y)) / 2
     
-    rn = np.random.uniform(0, 1, N)  #random number
-    # If rn < p_equal → Y = X
-    # else → Y = -X
-    Y = np.where(rn < p_equal, X, -X)
+#     rn = np.random.uniform(0, 1, N)  #random number
+#     # If rn < p_equal → Y = X
+#     # else → Y = -X
+#     Y = np.where(rn < p_equal, X, -X)
     
-    return X,Y
+#    return X,Y
 
 
 def EXYdelta(X, Y, delta, bins):
