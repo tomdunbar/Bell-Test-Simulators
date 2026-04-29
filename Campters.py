@@ -24,6 +24,59 @@ def campter2ang(C):
     return 1/2 * (np.sin(C))**2
 
 
+def f(x):
+    """
+    Outer to inner
+    
+    Original fcn
+    # x = np.asarray(x)
+    # x = x % (2*np.pi)     #restrict to 0 to 2pi
+    # x = x/(2*np.pi)   #normalize to 0 to 1
+    # n = np.floor(2*x)
+    # result =  n/2 + (1/np.pi)*np.arcsin(np.sqrt(2*x - n))
+    # return  (2*np.pi)*result  #return to 0 to 2pi
+    
+    Updated, for cleaner implimentation
+    Instead of computing floor, let modf split: 2x=n+r
+    where:
+        n = integer part
+        r = fractional part
+    and r = 2x - n, which is exactly the quantity inside the square root.
+    """
+
+    x = np.asarray(x) % (2*np.pi)  #restrict to 0 to 2pi
+
+    u = x/(2*np.pi)                #normalize to 0 to 1
+    r, n = np.modf(2*u)  # r = fractional part, n = integer part
+
+    return np.pi*n + np.arccos(1 - 2*r)  #simplied formula, absorbing the 2*pi
+
+def g(x):
+    """
+    inner to outer
+    
+    Original fcn
+    x = np.asarray(x) % (2*np.pi)  #restrict to 0 to 2pi
+    x = x/(2*np.pi)                #normalize to 0 to 1
+    n = np.floor(2* x)
+    result = (2*np.pi)*((n/2) + 1/2*(np.sin(np.pi*(x - n/2)))**2)
+    """
+    x = np.asarray(x) % (2*np.pi)
+
+    n = np.floor(x/np.pi)
+    r = (x - np.pi*n)/np.pi
+
+    return np.pi*n + np.pi*(1 - np.cos(np.pi*r))/2
+
+
+def circle_plus(x, y):
+    return g(f(x) + f(y))
+
+def circle_minus(x,y):
+    return g(f(x) - f(y))
+
+
+
 
 def QMtheoryPair(x,y):
 # ------------------------------------
@@ -124,15 +177,17 @@ A = np.sign(np.cos(lam - a))
 B = np.sign(np.cos(lam + np.pi  - b))
 
 
-E_lhv = EXYdelta(A,B,mapping(delta_ab), bins)
+#E_lhv = EXYdelta(A,B,mapping(delta_ab), bins)
+E_lhv = EXYdelta(A,B,delta_ab, bins)
 
 
 #QM theory for testing
 A, B = QMtheoryPair(a,b)
 
+#E_QM = EXYdelta(A,B,mapping(delta_ab), bins)
 E_QM = EXYdelta(A,B,delta_ab, bins)
 
-#E_map = EXYdelta(A,B,mapping(delta_ab), bins)
+
 
 # ------------------------------------
 # Ideal and Monte Carlo results
