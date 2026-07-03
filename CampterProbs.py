@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Apr  1 11:49:00 2026
+Created on Sun May  3 11:05:41 2026
 
 @author: Gamer
 """
-
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -78,27 +77,21 @@ def compute_probabilities(data):
     
 #Reference Frame Response function
 def RefFrameResp(x,y):
-    #Probability that R == +1, given x and y
-    
-    theta = (x+y) % (2*np.pi)
-    
-    p_equal =2* 1/2* (np.sin(theta))**2
+    #Probability of alignment
+    p_align = np.pi*1/(2) * (np.sin(x+y))**2
     
     
     rn = np.random.uniform(0, 1, len(x))  #random numbers
 
-    # If rn < p_equal → +1 (up)
-    # else → -1 (down)
-    R = np.where(rn < p_equal, 1, -1)
+    # If rn < p_equal → +1 (aligned)
+    # else → -1 (anti-aligned)
+    R = np.where(rn < p_align, 1, -1)
     return R
 
 
 # ------------------------------------
 # Random Reference Frame Angles
 # ------------------------------------
-#lamA = np.random.uniform(0, 2*np.pi, N)
-#lamB = np.random.uniform(0, 2*np.pi, N)
-
 lam = np.random.uniform(0, 2*np.pi, N)
 
 # ------------------------------------
@@ -118,8 +111,8 @@ delta_ab = (alpha - beta) % (2*np.pi)
 #B = np.sign(np.cos(beta - lamA + np.pi))
 
 
-A = RefFrameResp(alpha, lam)
-B = RefFrameResp(beta, lam)
+A = RefFrameResp(lam, alpha)
+B = RefFrameResp(lam, beta+np.pi)
 
 compute_probabilities(A)
 compute_probabilities(B)
